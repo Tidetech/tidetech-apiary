@@ -384,6 +384,7 @@ definitions:
               type: string
               description: Available data formats
               enum: ['grb', 'nc']
+              uniqueItems: true
           file_size_zipped_grb: 
             type: string
             description: File size for the full GRIB zipped .bz2 file
