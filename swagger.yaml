@@ -33,7 +33,6 @@ paths:
     get:
       description: |
         Returns metadata for all forecast datasets that you have access to.
-      operationId: getDatasets
       security:
         - APIKey: []
       responses:
@@ -51,7 +50,8 @@ paths:
     get:
       description: |
         Returns metadata for a single forecast dataset
-      operationId: find dataset by name
+      security:
+        - APIKey: []
       parameters:
         - name: name
           in: path
@@ -74,6 +74,8 @@ paths:
         - application/json
       description: |
         Download or subset a single forecast dataset in either GRIB or NetCDF format.
+      security:
+        - APIKey: []
       parameters:
         - name: name
           in: path
@@ -142,6 +144,8 @@ paths:
         - application/json
       description: |
         Download forecast dataset at one or more points.
+      security:
+        - APIKey: []
       parameters:
         - name: name
           in: path
@@ -165,11 +169,46 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /group/:
+    get:
+      description: |
+        Returns all forecase datasets listed by group that you have access to.
+      security:
+        - APIKey: []
+      responses:
+        200:
+          description: group response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Group'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /metadata/:
+    get:
+      description: |
+        Returns metadata for all forecast datasets that you have access to.
+      security:
+        - APIKey: []
+      responses:
+        200:
+          description: dataset response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Dataset'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /data/:
     get:
       description: |
         Returns metadata for all hindcast datasets that you have access to.
-      operationId: getData
+      security:
+        - APIKey: []
       responses:
         200:
           description: dataset response
@@ -187,6 +226,8 @@ paths:
         - application/json
       description: |
         Download data at one or more points for a single hindcast dataset.
+      security:
+        - APIKey: []
       parameters:
         - name: name
           in: path
@@ -218,6 +259,8 @@ paths:
         - application/json
       description: |
         Download a region (lon, lat, time bounded) for a single hindcast dataset in NetCDF format.
+      security:
+        - APIKey: []
       parameters:
         - name: name
           in: path
@@ -264,6 +307,8 @@ paths:
         - application/json
       description: |
         Download data at one or more points for multiple hindcast datasets.
+      security:
+        - APIKey: []
       parameters:
         - name: name
           in: query
@@ -289,18 +334,40 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 definitions:
-  Dataset:
+  DatasetSummary:
     allOf:
       - required:
         - name
+        properties:
+          name:
+            type: string
+          url:
+            type: string
+  Dataset:
+    allOf:
+      - $ref: '#/definitions/DatasetSummary'
+      - properties:
+          id:
+            type: integer
+            format: int32
+          title:
+            type: string
+  Group:
+    allOf:
+      - required:
+        - id
         properties:
           id:
             type: integer
             format: int32
           name:
             type: string
-          title:
+          url:
             type: string
+          datasets:
+            type: array
+            items:
+              $ref: '#/definitions/DatasetSummary'
   HindcastDataset:
     allOf:
       - required:
