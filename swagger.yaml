@@ -73,7 +73,13 @@ paths:
         - application/octet-stream
         - application/json
       description: |
-        Download or subset a single forecast dataset in either GRIB or NetCDF format.
+        Download or subset a single forecast dataset in either GRIB or NetCDF format. 
+        
+        *Caution, don't test this in the docs, as it returns large files.*
+        
+        In order to test, you can copy and paste the URL into a browser, or use a command line tool like Curl.
+        
+        Downloading a zipped dataset without subsetting will redirect to a S3 time-limited URL. You can stop this behaviour with the `no_redirect` parameter.
       security:
         - APIKey: []
       parameters:
@@ -108,12 +114,13 @@ paths:
         - name: time_steps
           in: query
           description: |
-            "Specific timesteps to select (1 is first), use comma separated string for many, e.g., 1,2,3,4"
+            Specific timesteps to select (1 is first), use comma separated string for many, e.g., '1,2,3,4'
           required: false
           type: string
         - name: codes
           in: query
-          description: "Select specific codes, comma separated string (e.g., 49,50)"
+          description: |
+            Select specific `codes`, comma separated string, e.g., '49,50'
           required: false
           type: string
         - name: filename
@@ -246,7 +253,7 @@ paths:
           default: false
         - name: locations
           in: query
-          description: GeoJSON string with datetime as parameter
+          description: GeoJSON string with `datetime` and `codes` as parameter
           required: true
           type: string
       responses:
@@ -318,7 +325,7 @@ paths:
       parameters:
         - name: name
           in: query
-          description: Name of the dataset
+          description: Comma separated list of dataset names
           required: true
           type: string
         - name: zipped
@@ -454,8 +461,6 @@ definitions:
     discriminator: type
     required:
       - type
-    externalDocs:
-      url: "http://geojson.org/geojson-spec.html#geometry-objects"
     properties:
       type:
         type: string
@@ -476,8 +481,6 @@ definitions:
   Point:
     type: object
     description: GeoJSon geometry
-    externalDocs:
-      url: http://geojson.org/geojson-spec.html#id2
     allOf:
       - $ref: "#/definitions/Geometry"
       - properties:
@@ -486,8 +489,6 @@ definitions:
   Polygon:
     type: object
     description: GeoJSon geometry
-    externalDocs:
-      url: http://geojson.org/geojson-spec.html#id4
     allOf:
       - $ref: "#/definitions/Geometry"
       - properties:
@@ -503,8 +504,6 @@ definitions:
     required:
      - type
      - features
-    externalDocs:
-      url: "http://geojson.org/geojson-spec.html#featurecollection"
     properties:
       type:
         type: string
