@@ -252,6 +252,8 @@ paths:
       responses:
         200:
           description: File download
+          schema:
+            $ref: '#/definitions/PointFeatureCollection'
         default:
           description: unexpected error
           schema:
@@ -445,7 +447,6 @@ definitions:
             description: The period between timesteps in minutes
           geometry:
             $ref: '#/definitions/Polygon'
-          
   Geometry:
     type: object
     description: GeoJSon geometry
@@ -495,18 +496,22 @@ definitions:
               type: array
               items:
                 $ref: '#/definitions/Point2D'
-  MultiPoint:
+  PointFeatureCollection:
     type: object
-    description: GeoJSon geometry
+    description: GeoJSon point feature collection
+    required:
+     - type
+     - features
     externalDocs:
-      url: http://geojson.org/geojson-spec.html#id5
-    allOf:
-      - $ref: "#/definitions/Geometry"
-      - properties:
-          coordinates:
-            type: array
-            items:
-              $ref: '#/definitions/Point2D'
+      url: "http://geojson.org/geojson-spec.html#featurecollection"
+    properties:
+      type:
+        type: string
+        enum: ['FeatureCollection']
+      features:
+          type: array
+          items:
+            $ref: '#/definitions/Point'
   Error:
     required:
       - message
