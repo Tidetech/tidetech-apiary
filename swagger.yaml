@@ -346,6 +346,44 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /codes/:
+    get:
+      produces:
+        - application/json
+      description: |
+        List all the available codes that Tidetech data uses for parameters, including short and long names.
+      responses:
+        200:
+          description: List of codes
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Code'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /codes/{id}/:
+    get:
+      produces:
+        - application/json
+      description: |
+        Describe details about a single code.
+      parameters:
+        - name: id
+          in: path
+          description: ID for the code (the code itself)
+          required: true
+          type: string
+      responses:
+        200:
+          description: code response
+          schema:
+              $ref: '#/definitions/Code'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   DatasetSummary:
     allOf:
@@ -425,6 +463,18 @@ definitions:
             type: array
             items:
               $ref: '#/definitions/DatasetSummary'
+  Code:
+    allOf:
+      - properties:
+          code:
+            type: integer
+            format: int32
+          name:
+            type: string
+          description:
+            type: string
+          units:
+            type: string
   HindcastDataset:
     allOf:
       - required:
