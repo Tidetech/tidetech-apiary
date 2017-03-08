@@ -83,61 +83,16 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - name: name
-          in: path
-          description: Name of the dataset
-          required: true
-          type: string
-        - name: file_format
-          in: query
-          description: Output file format
-          required: true
-          type: string
-          enum: ['nc', 'grb']
-        - name: zipped
-          in: query
-          description: Zip the file (bz2) before downloading
-          required: false
-          type: boolean
-        - name: time_from
-          in: query
-          description: Time to slice dataset from
-          required: false
-          type: string
-          format: date-time
-        - name: time_to
-          in: query
-          description: Time to slice dataset to
-          required: false
-          type: string
-          format: date-time
-        - name: time_steps
-          in: query
-          description: |
-            Specific timesteps to select (1 is first), use comma separated string for many, e.g., '1,2,3,4'
-          required: false
-          type: string
-        - name: codes
-          in: query
-          description: |
-            Select specific `codes`, comma separated string, e.g., '49,50'
-          required: false
-          type: string
-        - name: filename
-          in: query
-          description: Output file name
-          required: false
-          type: string
-        - name: no_redirect
-          in: query
-          description: If set to True, this will stop any redirects to our external CDN
-          required: false
-          type: boolean
-        - name: bounds
-          in: query
-          description: Lat/lon bounds as a comma separated string in the order Lon-min, Lat-min, Lon-max, Lat-max 
-          required: false
-          type: string
+        - $ref: "#/parameters/Name"
+        - $ref: "#/parameters/FileFormat"
+        - $ref: "#/parameters/Zipped"
+        - $ref: "#/parameters/TimeFrom"
+        - $ref: "#/parameters/TimeTo"
+        - $ref: "#/parameters/TimeSteps"
+        - $ref: "#/parameters/Codes"
+        - $ref: "#/parameters/FileName"
+        - $ref: "#/parameters/NoRedirect"
+        - $ref: "#/parameters/BoundsString"
       responses:
         200:
           description: File download
@@ -154,21 +109,13 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - name: name
-          in: path
-          description: Name of the dataset
-          required: true
-          type: string
+        - $ref: "#/parameters/Name"
         - name: locations
           in: query
           description: GeoJSON string of point FeatureCollection with datetime as a parameter
           type: string
           required: true
-        - name: zipped
-          in: query
-          description: Zip the file (zip) before downloading
-          required: false
-          type: boolean
+        - $ref: "#/parameters/Zipped"
       responses:
         200:
           description: File download
@@ -240,17 +187,8 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - name: name
-          in: path
-          description: Name of the dataset
-          required: true
-          type: string
-        - name: zipped
-          in: query
-          description: Zip the file (zip) before downloading
-          required: false
-          type: boolean
-          default: false
+        - $ref: "#/parameters/Name"
+        - $ref: "#/parameters/Zipped"
         - name: locations
           in: query
           description: GeoJSON string with `datetime` and `codes` as parameter
@@ -275,11 +213,7 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - name: name
-          in: path
-          description: Name of the dataset
-          required: true
-          type: string
+        - $ref: "#/parameters/Name"
         - name: region
           in: query
           description: GeoJSON Polygon region
@@ -297,16 +231,8 @@ paths:
           required: true
           type: string
           format: date-time
-        - name: filename
-          in: query
-          description: Output filename
-          type: string
-          required: false
-        - name: zipped
-          in: query
-          description: Zip the file (zip) before downloading
-          required: false
-          type: boolean
+        - $ref: "#/parameters/FileName"
+        - $ref: "#/parameters/Zipped"
       responses:
         200:
           description: File download
@@ -328,12 +254,7 @@ paths:
           description: Comma separated list of dataset names
           required: true
           type: string
-        - name: zipped
-          in: query
-          description: Zip the file (zip) before downloading
-          required: false
-          type: boolean
-          default: false
+        - $ref: "#/parameters/Zipped"
         - name: locations
           in: query
           description: GeoJSON string with datetime as parameter
@@ -384,6 +305,72 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
+parameters:
+  Name:
+    name: name
+    in: path
+    description: Name of the dataset
+    required: true
+    type: string
+  FileFormat:
+    name: file_format
+    in: query
+    description: Output file format
+    required: true
+    type: string
+    enum: ['nc', 'grb']
+  Zipped:
+    name: zipped
+    in: query
+    description: Zip the file (bz2) before downloading
+    required: false
+    type: boolean
+  TimeFrom:
+    name: time_from
+    in: query
+    description: Time to slice dataset from
+    required: false
+    type: string
+    format: date-time
+  TimeTo:
+    name: time_to
+    in: query
+    description: Time to slice dataset to
+    required: false
+    type: string
+    format: date-time
+  TimeSteps:
+    name: time_steps
+    in: query
+    description: |
+      Specific timesteps to select (1 is first), use comma separated string for many, e.g., '1,2,3,4'
+    required: false
+    type: string
+  Codes:
+    name: codes
+    in: query
+    description: |
+      Select specific `codes`, comma separated string, e.g., '49,50'
+    required: false
+    type: string
+  FileName:
+    name: filename
+    in: query
+    description: Output file name
+    required: false
+    type: string
+  NoRedirect:
+    name: no_redirect
+    in: query
+    description: If set to True, this will stop any redirects to our external CDN
+    required: false
+    type: boolean
+  BoundsString:
+    name: bounds
+    in: query
+    description: Lat/lon bounds as a comma separated string in the order Lon-min, Lat-min, Lon-max, Lat-max 
+    required: false
+    type: string
 definitions:
   DatasetSummary:
     allOf:
@@ -564,7 +551,7 @@ definitions:
             $ref: '#/definitions/Point'
   Error:
     required:
-      - message
+      - detail
     properties:
-      message:
+      detail:
         type: string
