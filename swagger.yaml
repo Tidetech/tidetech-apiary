@@ -1,10 +1,27 @@
 swagger: "2.0"
 info:
   version: 1.0.0
-  title: Tidetech API v1
+  title: Tidetech Data API v3
   description: |
-    Tidetech API Documentation. Tidetech's API can be used to download data in a variety of formats.
-    Data is available in two types, forecast data download (the /dataset objects) and hindcast data download (the /data objects).
+    **Tidetech API Documentation**
+    
+    **Introduction**
+    
+    Tidetech's API can be used to download forecast and hindcast (historical) metocean data in a variety of formats. 
+    Data can be requested by region and by single or multiple points.
+    
+    **Forecast Data**
+    
+    Forecast data may be queried for individual datasets only (multiple datasets cannot be combined in one query at present). 
+    A catalogue of available datasets can be viewed here https://www.tidetech.org/data/
+    
+    Forecast data api requests should contain the endpoint **/dataset/**
+    
+    **Hindcast Data**
+    
+    Hindcast data may be queried for individual or multiple datasets (point data only), requests for a region of data can only be made for individual datasets.
+    
+    Hindcast data api requests should contain the endpoint **/data/**
   termsOfService: https://www.tidetech.org
   contact:
     name: Tidetech Support
@@ -21,6 +38,8 @@ consumes:
   - application/json
 produces:
   - application/json
+  
+  
   - application/octet-stream
 securityDefinitions:
   APIKey:
