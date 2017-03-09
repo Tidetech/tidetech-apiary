@@ -15,13 +15,13 @@ info:
     Forecast data may be queried for individual datasets only (multiple datasets cannot be combined in one query at present). 
     A catalogue of available datasets can be viewed here https://www.tidetech.org/data/
     
-    Forecast data api requests should contain the endpoint **/dataset/**
+    Forecast data api requests are accessed at the endpoint **/dataset/**
     
     **Hindcast Data**
     
     Hindcast data may be queried for individual or multiple datasets (point data only), requests for a region of data can only be made for individual datasets.
     
-    Hindcast data api requests should contain the endpoint **/data/**
+    Hindcast data api requests are accessed at the endpoint **/data/**
   termsOfService: https://www.tidetech.org
   contact:
     name: Tidetech Support
@@ -44,7 +44,8 @@ produces:
 securityDefinitions:
   APIKey:
     type: apiKey
-    description: Use a URL parameter to pass in the API Key.
+    description: |
+      Use a URL parameter to pass in the API Key.
     name: api_key
     in: query
 paths:
@@ -68,7 +69,7 @@ paths:
   /dataset/{name}/:
     get:
       description: |
-        Returns metadata for a single forecast dataset
+        Returns metadata for a single forecast dataset.
       security:
         - APIKey: []
       parameters:
@@ -291,7 +292,7 @@ paths:
       produces:
         - application/json
       description: |
-        List all the available codes that Tidetech data uses for parameters, including short and long names.
+        List all the available codes that Tidetech data uses for parameters, including names and units.
       responses:
         200:
           description: List of codes
