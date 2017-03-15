@@ -22,6 +22,8 @@ info:
     Hindcast data may be queried for individual or multiple datasets (point data only), requests for a region of data can only be made for individual datasets.
     
     Hindcast data api requests are accessed at the endpoint **/data/**
+    
+    For example code, see our [GitHub repository](https://github.com/Tidetech/tidetech-api-examples).
   termsOfService: https://www.tidetech.org
   contact:
     name: Tidetech Support
@@ -133,9 +135,7 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - $ref: "#/parameters/Name"
         - $ref: "#/parameters/LocationsString"
-        - $ref: "#/parameters/Zipped"
       responses:
         200:
           description: File download
@@ -153,9 +153,7 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - $ref: "#/parameters/Name"
         - $ref: "#/parameters/Locations"
-        - $ref: "#/parameters/Zipped"
       responses:
         200:
           description: File download
@@ -165,6 +163,9 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
+    parameters:
+      - $ref: "#/parameters/Name"
+      - $ref: "#/parameters/Zipped"
   /group/:
     get:
       description: |
@@ -229,8 +230,6 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - $ref: "#/parameters/Name"
-        - $ref: "#/parameters/Zipped"
         - $ref: "#/parameters/LocationsString"
       responses:
         200:
@@ -249,8 +248,6 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - $ref: "#/parameters/Name"
-        - $ref: "#/parameters/Zipped"
         - $ref: "#/parameters/Locations"
       responses:
         200:
@@ -261,6 +258,9 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
+    parameters:
+      - $ref: "#/parameters/Name"
+      - $ref: "#/parameters/Zipped"
   /data/{name}/area/:
     get:
       produces:
@@ -293,12 +293,6 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - name: name
-          in: query
-          description: Comma separated list of dataset names
-          required: true
-          type: string
-        - $ref: "#/parameters/Zipped"
         - $ref: "#/parameters/LocationsString"
       responses:
         200:
@@ -315,12 +309,6 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - name: name
-          in: query
-          description: Comma separated list of dataset names
-          required: true
-          type: string
-        - $ref: "#/parameters/Zipped"
         - $ref: "#/parameters/Locations"
       responses:
         200:
@@ -329,6 +317,13 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/Error'
+    parameters:
+      - name: name
+        in: query
+        description: Comma separated list of dataset names
+        required: true
+        type: string
+      - $ref: "#/parameters/Zipped"
   /codes/:
     get:
       produces:
@@ -450,14 +445,14 @@ parameters:
   LocationsString:
     name: locations
     in: query
-    description: GeoJSON FeatureCollection formatted as a string (see Locations object for definition)
+    description: GeoJSON FeatureCollection formatted as a string (see PointFeatureCollection object for definition)
     required: true
     type: string
     format: Location
   RegionString:
     name: region
     in: query
-    description: GeoJSON Polygon formatted as a string (see Region object for definition)
+    description: GeoJSON Polygon formatted as a string (see Polygon object for definition)
     required: true
     type: string
     format: Region
@@ -639,9 +634,7 @@ definitions:
     description: GeoJSon geometry
     allOf:
       - $ref: "#/definitions/PointGeometry"
-      - properties:
-          coordinates:
-            $ref: '#/definitions/Point2D'
+      - $ref: "#/definitions/GeometryProperties"
   Polygon:
     type: object
     description: GeoJSon geometry
