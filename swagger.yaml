@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   version: 1.0.0
-  title: Tidetech Data API v3
+  title: Tidetech Data API
   description: |
     **Tidetech API Documentation**
     
@@ -38,8 +38,6 @@ consumes:
   - application/json
 produces:
   - application/json
-  
-  
   - application/octet-stream
 securityDefinitions:
   APIKey:
@@ -48,6 +46,12 @@ securityDefinitions:
       Use a URL parameter to pass in the API Key.
     name: api_key
     in: query
+  APIHeader:
+    type: apiKey
+    description: |
+      Alternately, use a header to include your API Key like this: `'Authentication': 'Token ' + API_KEY`
+    name: Authentication
+    in: header
 paths:
   /dataset/:
     get:
@@ -130,15 +134,33 @@ paths:
         - APIKey: []
       parameters:
         - $ref: "#/parameters/Name"
-        - name: locations
-          in: query
-          description: GeoJSON string of point FeatureCollection with datetime as a parameter
-          type: string
-          required: true
+        - $ref: "#/parameters/LocationsString"
         - $ref: "#/parameters/Zipped"
       responses:
         200:
           description: File download
+          schema:
+            $ref: '#/definitions/PointFeatureCollection'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      produces:
+        - application/json
+      description: |
+        Download forecast dataset at one or more points.
+      security:
+        - APIKey: []
+      parameters:
+        - $ref: "#/parameters/Name"
+        - $ref: "#/parameters/Locations"
+        - $ref: "#/parameters/Zipped"
+      responses:
+        200:
+          description: File download
+          schema:
+            $ref: '#/definitions/PointFeatureCollection'
         default:
           description: unexpected error
           schema:
@@ -209,11 +231,27 @@ paths:
       parameters:
         - $ref: "#/parameters/Name"
         - $ref: "#/parameters/Zipped"
-        - name: locations
-          in: query
-          description: GeoJSON string with `datetime` and `codes` as parameter
-          required: true
-          type: string
+        - $ref: "#/parameters/LocationsString"
+      responses:
+        200:
+          description: File download
+          schema:
+            $ref: '#/definitions/PointFeatureCollection'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      produces:
+        - application/json
+      description: |
+        Download data at one or more points for a single hindcast dataset.
+      security:
+        - APIKey: []
+      parameters:
+        - $ref: "#/parameters/Name"
+        - $ref: "#/parameters/Zipped"
+        - $ref: "#/parameters/Locations"
       responses:
         200:
           description: File download
@@ -234,23 +272,9 @@ paths:
         - APIKey: []
       parameters:
         - $ref: "#/parameters/Name"
-        - name: region
-          in: query
-          description: GeoJSON Polygon region
-          required: true
-          type: string
-        - name: start_datetime
-          in: query
-          description: Datetime to select from in ISO format
-          required: true
-          type: string
-          format: date-time
-        - name: end_datetime
-          in: query
-          description: Datetime to select to in ISO format
-          required: true
-          type: string
-          format: date-time
+        - $ref: "#/parameters/RegionString"
+        - $ref: "#/parameters/StartDateTime"
+        - $ref: "#/parameters/EndDateTime"
         - $ref: "#/parameters/FileName"
         - $ref: "#/parameters/Zipped"
       responses:
@@ -275,11 +299,29 @@ paths:
           required: true
           type: string
         - $ref: "#/parameters/Zipped"
-        - name: locations
+        - $ref: "#/parameters/LocationsString"
+      responses:
+        200:
+          description: File download
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      produces:
+        - application/json
+      description: |
+        Download data at one or more points for multiple hindcast datasets.
+      security:
+        - APIKey: []
+      parameters:
+        - name: name
           in: query
-          description: GeoJSON string with datetime as parameter
+          description: Comma separated list of dataset names
           required: true
           type: string
+        - $ref: "#/parameters/Zipped"
+        - $ref: "#/parameters/Locations"
       responses:
         200:
           description: File download
@@ -391,6 +433,48 @@ parameters:
     description: Lat/lon bounds as a comma separated string in the order Lon-min, Lat-min, Lon-max, Lat-max 
     required: false
     type: string
+  Locations:
+    name: locations
+    in: body
+    description: GeoJSON string or object with datetime as parameter
+    required: true
+    schema:
+      $ref: '#/definitions/PointFeatureCollection'
+  Region:
+    name: region
+    in: body
+    description: GeoJSON Polygon region
+    required: true
+    schema:
+      $ref: '#/definitions/PolygonGeometry'
+  LocationsString:
+    name: locations
+    in: query
+    description: GeoJSON FeatureCollection formatted as a string (see Locations object for definition)
+    required: true
+    type: string
+    format: Location
+  RegionString:
+    name: region
+    in: query
+    description: GeoJSON Polygon formatted as a string (see Region object for definition)
+    required: true
+    type: string
+    format: Region
+  StartDateTime:
+    name: start_datetime
+    in: query
+    description: Datetime to select from in ISO format
+    required: true
+    type: string
+    format: date-time
+  EndDateTime:
+    name: end_datetime
+    in: query
+    description: Datetime to select to in ISO format
+    required: true
+    type: string
+    format: date-time
 definitions:
   DatasetSummary:
     allOf:
@@ -512,7 +596,7 @@ definitions:
             description: The period between timesteps in minutes
           geometry:
             $ref: '#/definitions/Polygon'
-  Geometry:
+  PointGeometry:
     type: object
     description: GeoJSon geometry
     discriminator: type
@@ -523,12 +607,27 @@ definitions:
         type: string
         enum:
         - Point
-        - LineString
-        - Polygon
-        - MultiPoint
-        - MultiLineString
-        - MultiPolygon
         description: the geometry type
+      coordinates:
+        $ref: '#/definitions/Point2D'
+  PolygonGeometry:
+    type: object
+    description: GeoJSon geometry
+    discriminator: type
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+        - Point
+        description: the geometry type
+      coordinates:
+        type: array
+        items:
+          type: array
+          items:
+            $ref: '#/definitions/Point2D'
   Point2D:
     type: array
     maxItems: 2
@@ -539,7 +638,7 @@ definitions:
     type: object
     description: GeoJSon geometry
     allOf:
-      - $ref: "#/definitions/Geometry"
+      - $ref: "#/definitions/PointGeometry"
       - properties:
           coordinates:
             $ref: '#/definitions/Point2D'
@@ -547,14 +646,8 @@ definitions:
     type: object
     description: GeoJSon geometry
     allOf:
-      - $ref: "#/definitions/Geometry"
-      - properties:
-          coordinates:
-            type: array
-            items:
-              type: array
-              items:
-                $ref: '#/definitions/Point2D'
+      - $ref: "#/definitions/PolygonGeometry"
+      - $ref: "#/definitions/GeometryProperties"
   PointFeatureCollection:
     type: object
     description: GeoJSon point feature collection
@@ -569,6 +662,21 @@ definitions:
           type: array
           items:
             $ref: '#/definitions/Point'
+  GeometryProperties:
+    type: object
+    description: Propeties for geometry features
+    properties:
+      id:
+        type: string
+        description: Unique ID used to identify returned features
+      datetime:
+        type: string
+        format: date-time
+        description: |
+          'Date-time to get values at. Use ISO format, i.e., YYYY-mm-ddTHH:MM:SS.000Z'
+      codes:
+        type: string
+        description: Comma separated string of codes, leave blank for all
   Error:
     required:
       - detail
