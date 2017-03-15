@@ -441,7 +441,7 @@ parameters:
     description: GeoJSON Polygon region
     required: true
     schema:
-      $ref: '#/definitions/PolygonGeometry'
+      $ref: '#/definitions/Polygon'
   LocationsString:
     name: locations
     in: query
@@ -591,21 +591,13 @@ definitions:
             description: The period between timesteps in minutes
           geometry:
             $ref: '#/definitions/Polygon'
-  PointGeometry:
-    type: object
-    description: GeoJSon geometry
-    discriminator: type
-    required:
-      - type
-    properties:
-      type:
-        type: string
-        enum:
-        - Point
-        description: the geometry type
-      coordinates:
-        $ref: '#/definitions/Point2D'
-  PolygonGeometry:
+  Point2D:
+    type: array
+    maxItems: 2
+    minItems: 2
+    items:
+      type: number
+  Polygon:
     type: object
     description: GeoJSon geometry
     discriminator: type
@@ -623,24 +615,33 @@ definitions:
           type: array
           items:
             $ref: '#/definitions/Point2D'
-  Point2D:
-    type: array
-    maxItems: 2
-    minItems: 2
-    items:
-      type: number
+  PointGeometry:
+    type: object
+    description: GeoJSon geometry
+    discriminator: type
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+        - Point
+        description: the geometry type
+      coordinates:
+        $ref: '#/definitions/Point2D'
   Point:
     type: object
     description: GeoJSon geometry
-    allOf:
-      - $ref: "#/definitions/PointGeometry"
-      - $ref: "#/definitions/GeometryProperties"
-  Polygon:
-    type: object
-    description: GeoJSon geometry
-    allOf:
-      - $ref: "#/definitions/PolygonGeometry"
-      - $ref: "#/definitions/GeometryProperties"
+    properties:
+      geometry:
+        $ref: "#/definitions/PointGeometry"
+      properties:
+        $ref: "#/definitions/GeometryProperties"
+      type: 
+        type: string
+        enum:
+        - Feature
+        description: the geometry type
   PointFeatureCollection:
     type: object
     description: GeoJSon point feature collection
