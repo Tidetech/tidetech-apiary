@@ -153,7 +153,7 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - $ref: "#/parameters/Locations"
+        - $ref: "#/parameters/LocationsString"
       responses:
         200:
           description: File download
@@ -248,7 +248,7 @@ paths:
       security:
         - APIKey: []
       parameters:
-        - $ref: "#/parameters/Locations"
+        - $ref: "#/parameters/LocationsString"
       responses:
         200:
           description: File download
@@ -445,14 +445,19 @@ parameters:
   LocationsString:
     name: locations
     in: query
-    description: GeoJSON FeatureCollection formatted as a string (see PointFeatureCollection object for definition)
+    description: |
+      GeoJSON FeatureCollection formatted as a string (see PointFeatureCollection object for definition)
+      Here is an example string: `{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [72.56617, 13.85252]}, "properties": {"id": "0", "datetime": "2016-01-30T22:30:00.000Z"}}]}`
+      Note that this can also be a JSON object included in POST request, and can contain up to 10,000 points
     required: true
     type: string
     format: Location
   RegionString:
     name: region
     in: query
-    description: GeoJSON Polygon formatted as a string (see Polygon object for definition)
+    description: |
+      GeoJSON Polygon formatted as a string (see Polygon object for definition)
+      Here is an example string: `{"type": "Polygon", "coordinates": [[[100, 10], [100, 12], [102, 12], [102, 10], [100, 10]]]}`
     required: true
     type: string
     format: Region
